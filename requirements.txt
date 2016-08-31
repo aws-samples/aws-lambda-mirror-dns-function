@@ -1,0 +1,2 @@
+dnspython>=1.14
+boto3>=1.3

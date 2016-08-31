@@ -1,0 +1,29 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [{
+        "Effect": "Allow",
+        "Action": [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:*:*:*"
+    }, {
+        "Effect": "Allow",
+        "Action": [
+            "ec2:CreateNetworkInterface",
+            "ec2:DescribeNetworkInterfaces",
+            "ec2:DetachNetworkInterface",
+            "ec2:DeleteNetworkInterface"
+        ],
+        "Resource": "*"
+    }, {
+        "Sid": "Route53access",
+        "Effect": "Allow",
+        "Action": [
+            "route53:ChangeResourceRecordSets",
+            "route53:ListResourceRecordSets"
+        ],
+        "Resource": [ "*" ]
+    }]
+}

@@ -1,0 +1,5 @@
+[{
+        "Id": "mydomain.com",
+        "Arn": "arn: "<arn-of-lambda-function>",
+        "Input": "{\"Domain\": \"mydomain.com\",\"MasterDns\": \"10.0.0.1\",\"ZoneId\": \"AA11BB22CC33DD\",\"IgnoreTTL\": \"False\",\"ZoneSerial\": \"\"}"
+}]
