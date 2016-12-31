@@ -67,12 +67,10 @@ def update_resource_record(zone_id, host_name, hosted_zone_name, rectype, change
 
 
         for value in changerec:  # Build the recordset
-            if rectype != 'CNAME' and rectype != 'SRV' and rectype != 'MX' and rectype!= 'NS':
+            if (rectype != 'CNAME' and rectype != 'SRV' and rectype != 'MX' and rectype!= 'NS') or (str(value)[-1] == '.'):
                 dns_changes['Changes'][0]['ResourceRecordSet']['ResourceRecords'].append({'Value': str(value)})
             else:
                 dns_changes['Changes'][0]['ResourceRecordSet']['ResourceRecords'].append({'Value': str(value) + '.' + hosted_zone_name + '.'})
-
-        print dns_changes
 
         try:  # Submit API request to Route 53
             route53.change_resource_record_sets(HostedZoneId=zone_id, ChangeBatch=dns_changes)
