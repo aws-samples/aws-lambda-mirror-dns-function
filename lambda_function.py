@@ -31,9 +31,9 @@ import boto3
 
 # If you need to use a proxy server to access the Internet then hard code it 
 # the details below, otherwise comment out or remove.
-# os.environ["http_proxy"] = "10.10.10.10:3128"  # My on-premises proxy server
-# os.environ["https_proxy"] = "10.10.10.10:3128"
-# os.environ["no_proxy"] = "169.254.169.254"  # Don't proxy for meta-data service as Lambda  needs to get IAM credentials
+#os.environ["http_proxy"] = "10.10.10.10:3128"  # My on-premises proxy server
+#os.environ["https_proxy"] = "10.10.10.10:3128"
+#os.environ["no_proxy"] = "169.254.169.254"  # Don't proxy for meta-data service as Lambda  needs to get IAM credentials
 
 # setup the boto3 client to talk to AWS APIs
 route53 = boto3.client('route53')
@@ -65,8 +65,14 @@ def update_resource_record(zone_id, host_name, hosted_zone_name, rectype, change
             ]
         }
 
+
         for value in changerec:  # Build the recordset
-            dns_changes['Changes'][0]['ResourceRecordSet']['ResourceRecords'].append({'Value': str(value)})
+            if rectype != 'CNAME' and rectype != 'SRV' and rectype != 'MX' and rectype!= 'NS':
+                dns_changes['Changes'][0]['ResourceRecordSet']['ResourceRecords'].append({'Value': str(value)})
+            else:
+                dns_changes['Changes'][0]['ResourceRecordSet']['ResourceRecords'].append({'Value': str(value) + '.' + hosted_zone_name + '.'})
+
+        print dns_changes
 
         try:  # Submit API request to Route 53
             route53.change_resource_record_sets(HostedZoneId=zone_id, ChangeBatch=dns_changes)
@@ -190,12 +196,12 @@ def lambda_handler(event, context):
             # Change the record name so that it doesn't have the domain name appended
             recordname = record['Name'].replace(domain_name + '.', '')
             if recordname == '':
-                recordname = "@"
+                recordname = '@'
             else:
                 recordname = recordname.rstrip('.')
             rdataset = vpc_zone.find_rdataset(recordname, rdtype=str(record['Type']), create=True)
             for value in record['ResourceRecords']:
-                rdata = dns.rdata.from_text(1, rdataset.rdtype, value['Value'])
+                rdata = dns.rdata.from_text(1, rdataset.rdtype, value['Value'].replace(domain_name + '.', ''))
                 rdataset.add(rdata, ttl=int(record['TTL']))
     except BaseException as e:
         print e
