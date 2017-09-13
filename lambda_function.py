@@ -189,7 +189,7 @@ def lambda_handler(event, context):
     vpc_zone = dns.zone.Zone(origin=domain_name)
     print 'Getting VPC SOA serial from Route 53'  # Get the SOA from Route 53 by API to avoid getting stale records
     try:
-        vpc_recordset = route53.list_resource_record_sets(HostedZoneId=route53_zone_id)['ResourceRecordSets']
+        vpc_recordset = list(route53.get_paginator('list_resource_record_sets').paginate(HostedZoneId=route53_zone_id).search('ResourceRecordSets'))
         for record in vpc_recordset:
             # Change the record name so that it doesn't have the domain name appended
             recordname = record['Name'].replace(domain_name + '.', '')
