@@ -197,6 +197,9 @@ def lambda_handler(event, context):
                 recordname = '@'
             else:
                 recordname = recordname.rstrip('.')
+            ## replace \052 with * in record names
+            ## see: https://github.com/boto/boto/issues/818
+            recordname = recordname.replace(r'\052','*')
             rdataset = vpc_zone.find_rdataset(recordname, rdtype=str(record['Type']), create=True)
             for value in record['ResourceRecords']:
                 rdata = dns.rdata.from_text(1, rdataset.rdtype, value['Value'].replace(domain_name + '.', ''))
