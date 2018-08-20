@@ -192,14 +192,14 @@ def lambda_handler(event, context):
         vpc_recordset = route53.list_resource_record_sets(HostedZoneId=route53_zone_id)['ResourceRecordSets']
         for record in vpc_recordset:
             # Change the record name so that it doesn't have the domain name appended
-            recordname = record['Name'].replace(domain_name + '.', '')
+            recordname = ''.join(recordname.rsplit(domain_name, 1))
             if recordname == '':
                 recordname = '@'
             else:
                 recordname = recordname.rstrip('.')
             rdataset = vpc_zone.find_rdataset(recordname, rdtype=str(record['Type']), create=True)
             for value in record['ResourceRecords']:
-                rdata = dns.rdata.from_text(1, rdataset.rdtype, value['Value'].replace(domain_name + '.', ''))
+                rdata = dns.rdata.from_text(1, rdataset.rdtype, ''.join(value['Value'].rsplit(domain_name, 1)).rstrip('.'))
                 rdataset.add(rdata, ttl=int(record['TTL']))
     except BaseException as e:
         print e
