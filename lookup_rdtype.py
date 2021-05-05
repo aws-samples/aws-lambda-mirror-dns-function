@@ -90,6 +90,6 @@ record_type = {
 
 
 def recmap(rdtype):
-    for key, value in record_type.iteritems():
+    for key, value in record_type.items():
         if key == rdtype:
             return value
